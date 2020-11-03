@@ -50,10 +50,6 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "1.13.3"
     }
-    # kubernetes-alpha = {
-    #   source  = "hashicorp/kubernetes-alpha"
-    #   version = "0.2.1"
-    # }
   }
   backend "s3" {
     endpoint                    = "https://s3.us-west-002.backblazeb2.com"
@@ -89,14 +85,3 @@ provider "kubernetes" {
     digitalocean_kubernetes_cluster.funkhouse_rs_cluster.kube_config[0].cluster_ca_certificate
   )
 }
-
-# The following is the experimental kubernetes-alpha provider configuration,
-# which appears to not work with DigitalOcean at this time.
-
-# provider "kubernetes-alpha" {
-#   host             = digitalocean_kubernetes_cluster.funkhouse_rs_cluster.endpoint
-#   token            = digitalocean_kubernetes_cluster.funkhouse_rs_cluster.kube_config[0].token
-#   cluster_ca_certificate = base64decode(
-#     digitalocean_kubernetes_cluster.funkhouse_rs_cluster.kube_config[0].cluster_ca_certificate
-#   )
-# }

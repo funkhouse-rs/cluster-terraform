@@ -10,3 +10,12 @@ resource "digitalocean_kubernetes_cluster" "funkhouse_rs_cluster" {
     node_count = 2
   }
 }
+
+# Install the metrics-server. Let it live in kube-system.
+
+resource "helm_release" "metrics_server" {
+  name       = "metrics-server"
+  repository = "https://charts.helm.sh/stable"
+  chart      = "metrics-server"
+  namespace  = "kube-system"
+}
