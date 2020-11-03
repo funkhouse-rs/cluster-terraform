@@ -26,6 +26,12 @@ variable "do_region" {
   default     = "nyc1"
 }
 
+variable "lets_encrypt_email" {
+  type        = string
+  description = "Email address used to interact with Let's Encrypt ACME."
+  default     = "christian@funkhouse.rs"
+}
+
 terraform {
   required_providers {
     digitalocean = {

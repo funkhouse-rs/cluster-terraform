@@ -62,3 +62,17 @@ resource "helm_release" "cert_manager" {
     value = true
   }
 }
+
+# Cert Manager relies on ClusterIssuer CRDs, which we install with our own chart
+# included in this directory.
+
+resource "helm_release" "lets_encrypt_clusterissuers" {
+  name      = "lets-encrypt-clusterissuers"
+  chart     = "./charts/lets-encrypt"
+  namespace = kubernetes_namespace.networking.metadata[0].name
+
+  set {
+    name  = "email"
+    value = var.lets_encrypt_email
+  }
+}
