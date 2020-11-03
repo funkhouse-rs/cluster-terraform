@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "httpdumper.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "httpdumper.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "httpdumper.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "httpdumper.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: cfunkhouser/httpdumper:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP

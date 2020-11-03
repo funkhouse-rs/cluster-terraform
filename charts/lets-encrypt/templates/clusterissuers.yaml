@@ -2,7 +2,7 @@
 apiVersion: cert-manager.io/v1alpha2
 kind: ClusterIssuer
 metadata:
-  name: {{ .Chart.Name }}-{{ .Release.Name }}-staging
+  name: {{ .Release.Name }}-letsencrypt-staging
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "lets-encrypt.labels" . | nindent 4 }}
@@ -11,7 +11,7 @@ spec:
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     email: {{ .Values.email }}
     privateKeySecretRef:
-      name: {{ .Chart.Name }}-{{ .Release.Name }}-staging
+      name: {{ .Release.Name }}-letsencrypt-staging
     solvers:
       - selector: {}
         http01:
@@ -21,7 +21,7 @@ spec:
 apiVersion: cert-manager.io/v1alpha2
 kind: ClusterIssuer
 metadata:
-  name: {{ .Chart.Name }}-{{ .Release.Name }}-prod
+  name: {{ .Release.Name }}-letsencrypt-prod
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "lets-encrypt.labels" . | nindent 4 }}
@@ -30,7 +30,7 @@ spec:
     server: https://acme-v02.api.letsencrypt.org/directory
     email: {{ .Values.email }}
     privateKeySecretRef:
-      name: {{ .Chart.Name }}-{{ .Release.Name }}-prod
+      name: {{ .Release.Name }}-letsencrypt-prod
     solvers:
       - selector: {}
         http01:

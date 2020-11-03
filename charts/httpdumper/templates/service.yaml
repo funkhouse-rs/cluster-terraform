@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "httpdumper.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "httpdumper.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "httpdumper.selectorLabels" . | nindent 4 }}
