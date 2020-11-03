@@ -12,7 +12,7 @@ variable "cluster_purpose" {
 variable "cluster_version" {
   type        = string
   description = "DigitalOcean Kubernetes version. Possible values from `doctl kubernetes options versions`"
-  default     = "1.19.3-do.0"
+  default     = "1.19.3-do.1"
 }
 
 variable "do_token" {
@@ -30,6 +30,10 @@ variable "lets_encrypt_email" {
   type        = string
   description = "Email address used to interact with Let's Encrypt ACME."
   default     = "christian@funkhouse.rs"
+}
+
+locals {
+  cluster_domain = "${var.cluster_purpose}.${var.do_region}.funkhouse.rs"
 }
 
 terraform {

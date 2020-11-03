@@ -40,39 +40,4 @@ resource "helm_release" "cloudflare_external_dns" {
     name  = "cloudflare.proxied"
     value = false
   }
-
-  # Limit the ExternalDNS to $purpose.$region.funkhouse.rs.
-  # For example, dev.nyc1.funkhouse.rs for a "dev" cluster in NYC1.
-  set {
-    name  = "domainFilters[0]"
-    value = "${var.cluster_purpose}.${var.do_region}.funkhouse.rs"
-  }
-}
-
-# Cert Manager
-
-resource "helm_release" "cert_manager" {
-  name       = "cert-manager"
-  repository = "https://charts.jetstack.io"
-  chart      = "cert-manager"
-  namespace  = kubernetes_namespace.networking.metadata[0].name
-
-  set {
-    name  = "installCRDs"
-    value = true
-  }
-}
-
-# Cert Manager relies on ClusterIssuer CRDs, which we install with our own chart
-# included in this directory.
-
-resource "helm_release" "lets_encrypt_clusterissuers" {
-  name      = "lets-encrypt-clusterissuers"
-  chart     = "./charts/lets-encrypt"
-  namespace = kubernetes_namespace.networking.metadata[0].name
-
-  set {
-    name  = "email"
-    value = var.lets_encrypt_email
-  }
 }
