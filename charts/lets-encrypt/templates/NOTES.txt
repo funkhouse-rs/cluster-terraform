@@ -1,0 +1,5 @@
+ClusterIssuers for Let's Encrypt have been configured with email: {{ .Values.email }}
+
+See them with:
+
+  kubectl get clusterissuer --namespace {{ .Release.Namespace }}
