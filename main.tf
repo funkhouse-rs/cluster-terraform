@@ -1,3 +1,8 @@
+variable "auth0_domain" {
+  type        = string
+  description = "Auth0 Domain"
+}
+
 variable "cloudflare_token" {
   type        = string
   description = "CloudFlare API Token. Needed for ExternalDNS."
@@ -38,6 +43,10 @@ locals {
 
 terraform {
   required_providers {
+    auth0 = {
+      source  = "alexkappa/auth0"
+      version = "0.15.2"
+    }
     digitalocean = {
       source  = "digitalocean/digitalocean"
       version = "2.0.2"
@@ -60,6 +69,11 @@ terraform {
     skip_metadata_api_check     = true
     skip_region_validation      = true
   }
+}
+
+provider "auth0" {
+  domain = var.auth0_domain
+  # TODO(cfunkhouser): Add variables, don't rely on env vars.
 }
 
 provider "digitalocean" {

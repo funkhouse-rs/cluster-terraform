@@ -41,3 +41,35 @@ resource "helm_release" "cloudflare_external_dns" {
     value = false
   }
 }
+
+# We make use of the Pomerium authenticating proxy, and back it with Auth0.
+# Here, we create two Auth0 applications (called "clients" in the API):
+# The first will handle authentication, and the second will have a grant for the
+# management API to retrieve roles, and will be used for authorization.
+
+locals {
+  auth_hostname           = "authenticate.${local.cluster_domain}"
+  auth_service_url        = "https://${local.auth_hostname}/"
+  management_api_audience = "https://${var.auth0_domain}/api/v2/"
+}
+
+resource "auth0_client" "oidc_authentication_client" {
+  name               = "${local.cluster_domain} Cluster Authentication"
+  description        = "Cluster ${local.cluster_domain} OIDC Authentication Client"
+  app_type           = "regular_web"
+  initiate_login_uri = local.auth_service_url
+  callbacks          = ["${local.auth_service_url}oauth2/callback"]
+}
+
+resource "auth0_client" "oidc_authorization_client" {
+  name        = "${local.cluster_domain} Cluster Authorization"
+  description = "Cluster ${local.cluster_domain} OIDC Authorization Client"
+  app_type    = "non_interactive"
+}
+
+resource "auth0_client_grant" "oidc_authorization_management_api_client_grant" {
+  client_id = auth0_client.oidc_authorization_client.id
+  audience  = local.management_api_audience
+  scope     = ["read:roles", "read:role_members"]
+}
+
