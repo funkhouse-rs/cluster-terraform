@@ -43,7 +43,7 @@ resource "kubernetes_ingress" "ingress_debug" {
     # TODO(cfunkhouser): Wire up a wildcard certificate for this ingress, so
     # the default backend can be served using TLS.
     tls {
-      secret_name = "${local.debug_service_name}-secret"
+      secret_name = "debug-secret"
       hosts       = [local.debug_hostname]
     }
     rule {
@@ -62,4 +62,51 @@ resource "kubernetes_ingress" "ingress_debug" {
     }
   }
   depends_on = [helm_release.httpdumper]
+}
+
+locals {
+  authdebug_hostname = "authdebug.${local.cluster_domain}"
+}
+
+resource "kubernetes_ingress" "ingress_authdebug" {
+  metadata {
+    name      = "authdebug"
+    namespace = kubernetes_namespace.networking.metadata[0].name
+    annotations = {
+      "cert-manager.io/cluster-issuer"               = "${helm_release.lets_encrypt_clusterissuers.name}-letsencrypt-prod"
+      "external-dns.alpha.kubernetes.io/hostname"    = local.authdebug_hostname
+      "kubernetes.io/ingress.class"                  = "nginx"
+      "nginx.ingress.kubernetes.io/backend-protocol" = "HTTPS"
+    }
+    labels = {
+      "k8s.funkhouse.rs/purpose" = "diagnostics"
+    }
+  }
+  spec {
+    backend {
+      service_name = "pomerium-proxy"
+      service_port = 443
+    }
+    # TODO(cfunkhouser): Wire up a wildcard certificate for this ingress, so
+    # the default backend can be served using TLS.
+    tls {
+      secret_name = "authdebug-secret"
+      hosts       = [local.authdebug_hostname]
+    }
+    rule {
+      # This is necessary to match the hostname using SNI, which will be
+      # obsolete when we have wildcards.
+      host = local.authdebug_hostname
+      http {
+        path {
+          backend {
+            service_name = "pomerium-proxy"
+            service_port = 443
+          }
+          path = "/"
+        }
+      }
+    }
+  }
+  depends_on = [helm_release.httpdumper, helm_release.pomerium]
 }

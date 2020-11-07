@@ -59,12 +59,18 @@ resource "auth0_client" "oidc_authentication_client" {
   app_type           = "regular_web"
   initiate_login_uri = local.auth_service_url
   callbacks          = ["${local.auth_service_url}oauth2/callback"]
+  jwt_configuration {
+    alg = "RS256"
+  }
 }
 
 resource "auth0_client" "oidc_authorization_client" {
   name        = "${local.cluster_domain} Cluster Authorization"
   description = "Cluster ${local.cluster_domain} OIDC Authorization Client"
   app_type    = "non_interactive"
+  jwt_configuration {
+    alg = "RS256"
+  }
 }
 
 resource "auth0_client_grant" "oidc_authorization_management_api_client_grant" {
@@ -73,3 +79,4 @@ resource "auth0_client_grant" "oidc_authorization_management_api_client_grant" {
   scope     = ["read:roles", "read:role_members"]
 }
 
+# See pomerium.tf for the actual Pomerium configuration.
